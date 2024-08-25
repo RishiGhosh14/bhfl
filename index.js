@@ -1,62 +1,50 @@
-const express = require('express');
-const cors = require('cors');
-require('dotenv').config();
-
+import express from 'express'
+import cors from 'cors'
 const app = express();
-app.use(cors());
+const port = process.env.PORT || 3000;
+
 app.use(express.json());
-
-
-app.post('/bfhl', (req, res) => {
-    try {
-        const { data } = req.body;
-
-        if (!Array.isArray(data)) {
-            return res.status(400).json({
-                is_success: false,
-                message: "Invalid data format. 'data' should be an array."
-            });
-        }
-
-        let numbers = [];
-        let alphabets = [];
-        let max_lowercase = '';
-
-        const user_id = `${process.env.FULL_NAME.replace(' ', '_').toLowerCase()}_${process.env.DOB}`;
-
-        data.forEach(item => {
-            if (/^\d+$/.test(item)) {
-                numbers.push(item);
-            } else if (/^[a-zA-Z]$/.test(item)) {
-                alphabets.push(item);
-                // Check for the highest lowercase alphabet
-                if (item === item.toLowerCase() && item > max_lowercase) {
-                    max_lowercase = item;
-                }
-            }
-        });
-
-        res.json({
-            is_success: true,
-            user_id,
-            email: process.env.EMAIL_ID,
-            roll_number: process.env.COLLEGE_ROLL_NUMBER,
-            numbers,
-            alphabets,
-            highest_lowercase_alphabet: max_lowercase ? [max_lowercase] : []
-        });
-    } catch (error) {
-        console.error('Error processing request:', error);
-        res.status(500).json({ is_success: false, message: 'Internal Server Error' });
-    }
-});
-
-
+app.use(cors({
+    origin: '*', // Allow only your frontend domain
+    methods: ['GET', 'POST'], // Allow only GET and POST requests
+  }));
+  
+// GET endpoint
 app.get('/bfhl', (req, res) => {
-    res.json({ operation_code: 1 });
+    res.status(200).json({ operation_code: 1 });
 });
 
+// POST endpoint
+app.post('/bfhl', (req, res) => {
+    const { data } = req.body;
+    const fullName = "vishal_16062002";
+    const dob = "16062002"; 
+    const email = "vishal.2021b@vitstudent.ac.in";
+    const rollNumber = "21BCI0246";
 
+    if (!data || !Array.isArray(data)) {
+        return res.status(400).json({ is_success: false, error: 'Invalid input data' });
+    }
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+    const numbers = data.filter(item => !isNaN(item));
+    const alphabets = data.filter(item => /^[a-zA-Z]$/.test(item));
+    const lowercaseAlphabets = alphabets.filter(item => /^[a-z]$/.test(item));
+
+    const highestLowercaseAlphabet = lowercaseAlphabets.length > 0 
+        ? [lowercaseAlphabets.sort().reverse()[0]] 
+        : [];
+
+    res.json({
+        is_success: true,
+        user_id: `${fullName}_${dob}`,
+        email: email,
+        roll_number: rollNumber,
+        numbers: numbers,
+        alphabets: alphabets,
+        highest_lowercase_alphabet: highestLowercaseAlphabet
+    });
+});
+
+app.listen(port, () => {
+    console.log(`Server running on http://localhost:${port}`);
+});
