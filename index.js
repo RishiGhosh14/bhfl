@@ -17,10 +17,10 @@ app.get('/bfhl', (req, res) => {
 // POST endpoint
 app.post('/bfhl', (req, res) => {
     const { data } = req.body;
-    const fullName = "vishal_16062002";
-    const dob = "16062002"; 
-    const email = "vishal.2021b@vitstudent.ac.in";
-    const rollNumber = "21BCI0246";
+    const fullName = "RISHI GHOSH";
+    const dob = "14032003"; 
+    const email = "rishi.ghosh2021b@vitstudent.ac.in";
+    const rollNumber = "21BCI0286";
 
     if (!data || !Array.isArray(data)) {
         return res.status(400).json({ is_success: false, error: 'Invalid input data' });
